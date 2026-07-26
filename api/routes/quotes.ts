@@ -7,11 +7,14 @@ const router = Router();
 
 // Reusable Transporter Utility Function
 const createTransporter = () => {
+  const emailUser = process.env.EMAIL_USER || "yashraj.transfer@gmail.com";
+  const emailPass = process.env.EMAIL_PASSWORD || "wwbytumkrnkzjdhp";
+
   return nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
+      user: emailUser,
+      pass: emailPass,
     },
     tls: {
       rejectUnauthorized: false,
@@ -70,9 +73,9 @@ router.post("/", async (req: Request, res: Response) => {
     });
 
     // Send Email Notification asynchronously (non-blocking for fast UI response)
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
-      const transporter = createTransporter();
-      const mailBody = `
+    const emailUser = process.env.EMAIL_USER || "yashraj.transfer@gmail.com";
+    const transporter = createTransporter();
+    const mailBody = `
 New Quote Request
 
 Customer Name: ${quote.name}
@@ -90,16 +93,15 @@ Submitted Date: ${quote.createdAt.toLocaleString()}
 YashRaj Money Transfer
 `;
 
-      transporter.sendMail({
-        from: `YashRaj Money Transfer <${process.env.EMAIL_USER}>`,
-        to: process.env.EMAIL_USER,
-        replyTo: quote.email,
-        subject: `New Quote Request - ${quote.name}`,
-        text: mailBody,
-      })
-      .then((info) => console.log("QUOTE EMAIL SENT SUCCESS:", info.response))
-      .catch((emailErr) => console.error("QUOTE EMAIL SEND ERROR:", emailErr));
-    }
+    transporter.sendMail({
+      from: `YashRaj Money Transfer <${emailUser}>`,
+      to: emailUser,
+      replyTo: quote.email,
+      subject: `New Quote Request - ${quote.name}`,
+      text: mailBody,
+    })
+    .then((info) => console.log("QUOTE EMAIL SENT SUCCESS:", info.response))
+    .catch((emailErr) => console.error("QUOTE EMAIL SEND ERROR:", emailErr));
 
     return res.status(201).json({
       success: true,
@@ -146,9 +148,9 @@ router.post("/calculator-quote", async (req: Request, res: Response) => {
     });
 
     // Send Email Notification asynchronously
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
-      const transporter = createTransporter();
-      const mailBody = `
+    const emailUser = process.env.EMAIL_USER || "yashraj.transfer@gmail.com";
+    const transporter = createTransporter();
+    const mailBody = `
 New Calculator Quote Request
 
 Conversion Summary: ${conversionDetails || "N/A"}
@@ -163,14 +165,15 @@ Submitted Date: ${quote.createdAt.toLocaleString()}
 YashRaj Money Transfer
 `;
 
-      transporter.sendMail({
-        from: `"${quote.name.trim()} via YashRaj Calculator" <${process.env.EMAIL_USER}>`,
-        to: process.env.EMAIL_USER,
-        replyTo: quote.email,
-        subject: `Calculator Quote: ${conversionDetails || quote.name}`,
-        text: mailBody,
-      }).catch(emailErr => console.error("EMAIL SEND ERROR:", emailErr));
-    }
+    transporter.sendMail({
+      from: `YashRaj Calculator <${emailUser}>`,
+      to: emailUser,
+      replyTo: quote.email,
+      subject: `Calculator Quote: ${conversionDetails || quote.name}`,
+      text: mailBody,
+    })
+    .then((info) => console.log("CALCULATOR EMAIL SENT SUCCESS:", info.response))
+    .catch((emailErr) => console.error("CALCULATOR EMAIL SEND ERROR:", emailErr));
 
     return res.status(201).json({
       success: true,
