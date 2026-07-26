@@ -5,6 +5,8 @@ export const dynamic = "force-dynamic"
 import { useState, useRef } from "react"
 import { Edit, Trash2, Upload, Image as ImageIcon, Folder, GripVertical, X, RefreshCw } from "lucide-react"
 
+import { API_URL } from "@/lib/api"
+
 interface GalleryItem {
   id: number
   title: string
@@ -104,7 +106,7 @@ export default function GalleryPage() {
 
       const token = localStorage.getItem("token")
 
-      const res = await fetch("http://localhost:5000/api/gallery", {
+      const res = await fetch(`${API_URL}/api/gallery`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`
