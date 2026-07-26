@@ -8,12 +8,15 @@ const router = Router();
 // Reusable Transporter Utility Function
 const createTransporter = () => {
   return nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: Number(process.env.EMAIL_PORT),
+    host: process.env.EMAIL_HOST || "smtp.gmail.com",
+    port: Number(process.env.EMAIL_PORT) || 587,
     secure: Number(process.env.EMAIL_PORT) === 465,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
+    },
+    tls: {
+      rejectUnauthorized: false,
     },
   });
 };
@@ -90,12 +93,14 @@ YashRaj Money Transfer
 `;
 
       transporter.sendMail({
-        from: `"${quote.name.trim()} via YashRaj Money Transfer" <${process.env.EMAIL_USER}>`,
+        from: `YashRaj Money Transfer <${process.env.EMAIL_USER}>`,
         to: process.env.EMAIL_USER,
         replyTo: quote.email,
         subject: `New Quote Request - ${quote.name}`,
         text: mailBody,
-      }).catch(emailErr => console.error("EMAIL SEND ERROR:", emailErr));
+      })
+      .then((info) => console.log("QUOTE EMAIL SENT SUCCESS:", info.response))
+      .catch((emailErr) => console.error("QUOTE EMAIL SEND ERROR:", emailErr));
     }
 
     return res.status(201).json({

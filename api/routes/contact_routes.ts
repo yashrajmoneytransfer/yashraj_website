@@ -36,9 +36,6 @@ router.post("/", async (req: Request, res: Response) => {
       }
     });
 
-    // Verify SMTP Connection
-    await transporter.verify();
-
     // 3. Prepare Email Body
     const mailBody = `
 New Contact Form Submission
@@ -55,14 +52,19 @@ ${message.trim()}
 YashRaj Money Transfer
 `;
 
-    // 4. Send Email
-    await transporter.sendMail({
-      from: `"${name.trim()} via YashRaj Website" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER,
-      replyTo: email.trim(),
-      subject: `New Enquiry from ${name.trim()} - ${subject || "Website Contact"}`,
-      text: mailBody
-    });
+    // 4. Send Email asynchronously
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
+      transporter.sendMail({
+        from: `YashRaj Website <${process.env.EMAIL_USER}>`,
+        to: process.env.EMAIL_USER,
+        replyTo: email.trim(),
+        subject: `New Enquiry from ${name.trim()} - ${subject || "Website Contact"}`,
+        text: mailBody
+      })
+      .then(info => console.log("CONTACT EMAIL SENT SUCCESS:", info.response))
+      .catch(err => console.error("CONTACT EMAIL ERROR:", err));
+    }
+
     return res.status(201).json({
       success: true,
       message: "Thank you! Your message has been sent successfully."
