@@ -1,0 +1,13 @@
+{
+  "name": "yashraj-api",
+  "version": "1.0.0",
+  "description": "YashRaj Money Transfer API",
+  "main": "server.ts",
+  "scripts": {
+    "start": "cd .. && npx tsx api/server.ts",
+    "dev": "cd .. && npx tsx watch api/server.ts"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}

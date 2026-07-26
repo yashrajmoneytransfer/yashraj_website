@@ -1,0 +1,295 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//////////////////////////////////////////////////////
+// ADMIN
+//////////////////////////////////////////////////////
+
+model Admin {
+  id         String   @id @default(cuid())
+  name       String
+  email      String   @unique
+  password   String
+  role       String   @default("admin")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////////
+// COUNTRIES
+//////////////////////////////////////////////////////
+
+model Country {
+  id              String   @id @default(cuid())
+  name            String
+  currencyName    String
+  currencyCode    String   @unique
+  currencySymbol  String
+  isoCode         String
+  flag            String?
+  buyRate         Float
+  sellRate        Float
+  isPopular       Boolean  @default(false)
+  isEnabled       Boolean  @default(true)
+  order           Int      @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  rates           CurrencyRate[]
+}
+
+//////////////////////////////////////////////////////
+// DAILY RATES
+//////////////////////////////////////////////////////
+
+model CurrencyRate {
+  id          String   @id @default(cuid())
+
+  countryId   String
+  country     Country  @relation(fields: [countryId], references: [id])
+
+  buyRate     Float
+  sellRate    Float
+
+  lastUpdated DateTime @default(now())
+
+  createdAt   DateTime @default(now())
+
+  @@index([countryId])
+}
+
+//////////////////////////////////////////////////////
+// QUOTE REQUESTS
+//////////////////////////////////////////////////////
+
+model QuoteRequest {
+  id              String   @id @default(cuid())
+  name            String
+  mobile          String
+  email           String
+  country         String
+  currency        String
+  amount          Float
+  purpose         String
+  
+  // 👈 క్యాలిక్యులేటర్ డేటా కోసం కొత్త ఫీల్డ్స్ (Optional / Nullable)
+  conversionType  String?  // "buy" లేదా "sell"
+  fromCurrency    String?  // ఉదా: INR
+  toCurrency      String?  // ఉదా: USD
+  convertedAmount Float?   // ఉదా: 11.98
+
+  status          String   @default("Pending")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////////
+// GALLERY
+//////////////////////////////////////////////////////
+
+model Gallery {
+
+  id          String   @id @default(cuid())
+
+  title       String
+
+  description String?
+
+  imageUrl    String
+
+  category    String
+
+  order       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+
+  updatedAt   DateTime @updatedAt
+
+}
+
+//////////////////////////////////////////////////////
+// REVIEWS
+//////////////////////////////////////////////////////
+
+model Review {
+
+  id          String   @id @default(cuid())
+
+  name        String
+
+  email       String
+
+  rating      Int
+
+  review      String
+
+  isApproved  Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+
+  updatedAt   DateTime @updatedAt
+
+}
+
+//////////////////////////////////////////////////////
+// FAQ
+//////////////////////////////////////////////////////
+
+model FAQ {
+
+  id          String   @id @default(cuid())
+
+  question    String
+
+  answer      String
+
+  category    String
+
+  order       Int      @default(0)
+
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+
+  updatedAt   DateTime @updatedAt
+
+}
+
+//////////////////////////////////////////////////////
+// SERVICES
+//////////////////////////////////////////////////////
+
+model Service {
+
+  id          String   @id @default(cuid())
+
+  title       String
+
+  description String
+
+  icon        String
+
+  imageUrl    String?
+
+  order       Int      @default(0)
+
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+
+  updatedAt   DateTime @updatedAt
+
+}
+
+//////////////////////////////////////////////////////
+// WEBSITE SETTINGS
+//////////////////////////////////////////////////////
+
+model WebsiteSettings {
+
+  id              String   @id @default(cuid())
+
+  companyName     String   @default("YashRaj Money Transfer")
+
+  mobile           String
+
+  email           String
+
+  whatsapp        String
+
+  address         String
+
+  businessHours   String?
+
+  googleMapsUrl   String?
+
+  googleMapEmbed  String?
+
+  logo            String?
+
+  heroTitle       String
+
+  heroSubtitle    String
+
+  aboutContent    String?
+
+  socialLinks     Json?
+
+  createdAt       DateTime @default(now())
+
+  updatedAt       DateTime @updatedAt
+
+}
+
+//////////////////////////////////////////////////////
+// SEO
+//////////////////////////////////////////////////////
+
+model SEO {
+
+  id                  String   @id @default(cuid())
+
+  metaTitle           String
+
+  metaDescription     String
+
+  keywords            String?
+
+  ogTitle             String?
+
+  ogDescription       String?
+
+  ogImage             String?
+
+  twitterCard         String?
+
+  canonicalUrl        String?
+
+  robotsTxt           String?
+
+  facebookUrl         String?
+
+  twitterUrl          String?
+
+  instagramUrl        String?
+
+  linkedinUrl         String?
+
+  createdAt           DateTime @default(now())
+
+  updatedAt           DateTime @updatedAt
+
+}
+
+//////////////////////////////////////////////////////
+// CONTACT ENQUIRIES
+//////////////////////////////////////////////////////
+
+model Enquiry {
+
+  id          String   @id @default(cuid())
+
+  name        String
+
+  email       String
+
+  mobile       String
+
+  subject     String
+
+  message     String
+
+  status      String   @default("Pending")
+
+  createdAt   DateTime @default(now())
+
+  updatedAt   DateTime @updatedAt
+
+}
