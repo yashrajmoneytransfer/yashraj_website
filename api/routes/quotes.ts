@@ -68,8 +68,8 @@ router.post("/", async (req: Request, res: Response) => {
       },
     });
 
-    // Send Email Notification
-    try {
+    // Send Email Notification asynchronously (non-blocking for fast UI response)
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
       const transporter = createTransporter();
       const mailBody = `
 New Quote Request
@@ -89,15 +89,13 @@ Submitted Date: ${quote.createdAt.toLocaleString()}
 YashRaj Money Transfer
 `;
 
-      await transporter.sendMail({
+      transporter.sendMail({
         from: `"${quote.name.trim()} via YashRaj Money Transfer" <${process.env.EMAIL_USER}>`,
         to: process.env.EMAIL_USER,
         replyTo: quote.email,
         subject: `New Quote Request - ${quote.name}`,
         text: mailBody,
-      });
-    } catch (emailErr) {
-      console.error("EMAIL SEND ERROR:", emailErr);
+      }).catch(emailErr => console.error("EMAIL SEND ERROR:", emailErr));
     }
 
     return res.status(201).json({
@@ -144,8 +142,8 @@ router.post("/calculator-quote", async (req: Request, res: Response) => {
       },
     });
 
-    // Send Email Notification
-    try {
+    // Send Email Notification asynchronously
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
       const transporter = createTransporter();
       const mailBody = `
 New Calculator Quote Request
@@ -162,15 +160,13 @@ Submitted Date: ${quote.createdAt.toLocaleString()}
 YashRaj Money Transfer
 `;
 
-      await transporter.sendMail({
+      transporter.sendMail({
         from: `"${quote.name.trim()} via YashRaj Calculator" <${process.env.EMAIL_USER}>`,
         to: process.env.EMAIL_USER,
         replyTo: quote.email,
         subject: `Calculator Quote: ${conversionDetails || quote.name}`,
         text: mailBody,
-      });
-    } catch (emailErr) {
-      console.error("EMAIL SEND ERROR:", emailErr);
+      }).catch(emailErr => console.error("EMAIL SEND ERROR:", emailErr));
     }
 
     return res.status(201).json({
