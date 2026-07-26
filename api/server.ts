@@ -34,31 +34,10 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 const corsOptions = {
-  origin(origin: any, callback: any) {
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
-      return callback(null, true);
-    }
-
-    return callback(new Error("CORS Not Allowed"));
-  },
-
+  origin: true,
   credentials: true,
-
-  methods: [
-    "GET",
-    "POST",
-    "PUT",
-    "PATCH",
-    "DELETE",
-    "OPTIONS",
-  ],
-
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization",
-  ],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 // CORS MUST BE FIRST
