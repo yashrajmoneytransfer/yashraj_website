@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import { useState, useEffect } from "react"
 import { Edit, Save, MapPin, Phone, Mail, Clock, Building, Loader2, CheckCircle2, Globe } from "lucide-react"
 import { API_URL } from "@/lib/api"

@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import { useState } from "react"
 import { Edit, Save, Mail, Lock, Server } from "lucide-react"
 
