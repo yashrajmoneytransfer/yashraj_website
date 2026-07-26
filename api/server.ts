@@ -17,7 +17,7 @@ import { contactRouter } from "./routes/contact_routes";
 
 const app = express();
 
-const PORT = Number(process.env.API_PORT) || 5000;
+const PORT = Number(process.env.PORT) || Number(process.env.API_PORT) || 5000;
 
 app.disable("x-powered-by");
 
@@ -28,14 +28,16 @@ const allowedOrigins = [
   "http://127.0.0.1:3001",
   "http://192.168.0.105:3000",
   "http://192.168.0.105:3001",
-  "http://192.168.0.115:3000"
-];
+  "http://192.168.0.115:3000",
+  "https://yashrajmoneytransfer.vercel.app",
+  process.env.FRONTEND_URL
+].filter(Boolean);
 
 const corsOptions = {
   origin(origin: any, callback: any) {
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
+    if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
       return callback(null, true);
     }
 
