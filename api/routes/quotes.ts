@@ -7,11 +7,15 @@ const router = Router();
 
 // Reusable Transporter Utility Function
 const createTransporter = () => {
+  const host = process.env.EMAIL_HOST || "smtp.gmail.com";
+  const port = Number(process.env.EMAIL_PORT) || 587;
   const emailUser = process.env.EMAIL_USER || "yashraj.transfer@gmail.com";
   const emailPass = process.env.EMAIL_PASSWORD || "wwbytumkrnkzjdhp";
 
   return nodemailer.createTransport({
-    service: "gmail",
+    host: host,
+    port: port,
+    secure: port === 465,
     auth: {
       user: emailUser,
       pass: emailPass,
@@ -28,10 +32,6 @@ const createTransporter = () => {
 POST /api/quotes
 =========================================================
 */
-/* =========================================================
-1. CREATE QUOTE REQUEST (Public API)
-POST /api/quotes
-========================================================= */
 router.post("/", async (req: Request, res: Response) => {
   try {
     const { 
@@ -72,36 +72,86 @@ router.post("/", async (req: Request, res: Response) => {
       },
     });
 
-    // Send Email Notification asynchronously (non-blocking for fast UI response)
+    // Send Email Notifications asynchronously
     const emailUser = process.env.EMAIL_USER || "yashraj.transfer@gmail.com";
     const transporter = createTransporter();
-    const mailBody = `
-New Quote Request
+
+    // 1. Admin Email Notification
+    const adminMailBody = `
+New Quote Request Details:
 
 Customer Name: ${quote.name}
 Mobile Number: ${quote.mobile}
 Customer Email: ${quote.email}
 Country/To Currency: ${quote.country}
 Currency: ${quote.currency}
-Amount: ${quote.amount}
+Amount: ₹${Number(quote.amount).toLocaleString()}
 Purpose: ${quote.purpose}
 Conversion Details: ${quote.fromCurrency || "INR"} -> ${quote.toCurrency || quote.currency} (${quote.conversionType || "N/A"})
 Status: ${quote.status}
 Submitted Date: ${quote.createdAt.toLocaleString()}
 
 --------------------------------
-YashRaj Money Transfer
+YashRaj Money Transfer Admin
 `;
+
+    const adminHtmlBody = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+        <h2 style="color: #1e3a8a; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px;">New Quote Request</h2>
+        <p style="font-size: 14px; color: #333;">You have received a new quote request from your website:</p>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;">
+          <tr><td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #eee;">Customer Name:</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${quote.name}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #eee;">Mobile:</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${quote.mobile}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #eee;">Email:</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${quote.email}">${quote.email}</a></td></tr>
+          <tr><td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #eee;">Amount:</td><td style="padding: 8px; border-bottom: 1px solid #eee;">₹${Number(quote.amount).toLocaleString()}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #eee;">Currency Pair:</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${quote.fromCurrency || "INR"} &rarr; ${quote.toCurrency || quote.currency}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #eee;">Purpose:</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${quote.purpose}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #eee;">Status:</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-weight: bold;">${quote.status}</span></td></tr>
+          <tr><td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #eee;">Date:</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${quote.createdAt.toLocaleString()}</td></tr>
+        </table>
+        <br/>
+        <p style="font-size: 12px; color: #888;">YashRaj Money Transfer</p>
+      </div>
+    `;
 
     transporter.sendMail({
       from: `YashRaj Money Transfer <${emailUser}>`,
       to: emailUser,
       replyTo: quote.email,
       subject: `New Quote Request - ${quote.name}`,
-      text: mailBody,
+      text: adminMailBody,
+      html: adminHtmlBody,
     })
-    .then((info) => console.log("QUOTE EMAIL SENT SUCCESS:", info.response))
-    .catch((emailErr) => console.error("QUOTE EMAIL SEND ERROR:", emailErr));
+    .then((info) => console.log("ADMIN QUOTE EMAIL SENT SUCCESS:", info.response))
+    .catch((emailErr) => console.error("ADMIN QUOTE EMAIL SEND ERROR:", emailErr));
+
+    // 2. Customer Confirmation Email
+    const customerHtmlBody = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+        <h2 style="color: #1e3a8a;">Quote Request Received!</h2>
+        <p style="font-size: 14px; color: #333;">Dear <strong>${quote.name}</strong>,</p>
+        <p style="font-size: 14px; color: #555;">Thank you for reaching out to YashRaj Money Transfer. We have successfully received your quote request.</p>
+        <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; margin: 15px 0;">
+          <h4 style="margin-top: 0; color: #1e3a8a;">Request Summary:</h4>
+          <p style="margin: 5px 0; font-size: 14px;"><strong>Amount:</strong> ₹${Number(quote.amount).toLocaleString()}</p>
+          <p style="margin: 5px 0; font-size: 14px;"><strong>Currency:</strong> ${quote.fromCurrency || "INR"} &rarr; ${quote.toCurrency || quote.currency}</p>
+          <p style="margin: 5px 0; font-size: 14px;"><strong>Purpose:</strong> ${quote.purpose}</p>
+        </div>
+        <p style="font-size: 14px; color: #333;">Our forex specialist will review your request and get in touch with you shortly.</p>
+        <br/>
+        <p style="font-size: 12px; color: #888;">Best Regards,<br/><strong>YashRaj Money Transfer Team</strong></p>
+      </div>
+    `;
+
+    transporter.sendMail({
+      from: `YashRaj Money Transfer <${emailUser}>`,
+      to: quote.email,
+      subject: `Quote Request Received - YashRaj Money Transfer`,
+      text: `Dear ${quote.name},\n\nThank you for requesting a forex quote with YashRaj Money Transfer. We have received your request for Amount: ${quote.amount} (${quote.fromCurrency || "INR"} to ${quote.toCurrency || quote.currency}).\n\nOur team will contact you shortly.\n\nBest Regards,\nYashRaj Money Transfer`,
+      html: customerHtmlBody,
+    })
+    .then((info) => console.log("CUSTOMER QUOTE CONFIRMATION EMAIL SENT SUCCESS:", info.response))
+    .catch((emailErr) => console.error("CUSTOMER QUOTE CONFIRMATION EMAIL ERROR:", emailErr));
 
     return res.status(201).json({
       success: true,
@@ -147,16 +197,18 @@ router.post("/calculator-quote", async (req: Request, res: Response) => {
       },
     });
 
-    // Send Email Notification asynchronously
+    // Send Email Notifications asynchronously
     const emailUser = process.env.EMAIL_USER || "yashraj.transfer@gmail.com";
     const transporter = createTransporter();
-    const mailBody = `
-New Calculator Quote Request
+
+    const adminMailBody = `
+New Calculator Quote Request:
 
 Conversion Summary: ${conversionDetails || "N/A"}
 Customer Name: ${quote.name}
 Mobile Number: ${quote.mobile}
 Customer Email: ${quote.email}
+Amount: ₹${Number(quote.amount).toLocaleString()}
 Purpose: ${quote.purpose}
 Status: ${quote.status}
 Submitted Date: ${quote.createdAt.toLocaleString()}
@@ -170,10 +222,20 @@ YashRaj Money Transfer
       to: emailUser,
       replyTo: quote.email,
       subject: `Calculator Quote: ${conversionDetails || quote.name}`,
-      text: mailBody,
+      text: adminMailBody,
     })
     .then((info) => console.log("CALCULATOR EMAIL SENT SUCCESS:", info.response))
     .catch((emailErr) => console.error("CALCULATOR EMAIL SEND ERROR:", emailErr));
+
+    // Also send confirmation to customer
+    transporter.sendMail({
+      from: `YashRaj Money Transfer <${emailUser}>`,
+      to: quote.email,
+      subject: `Calculator Quote Request Received - YashRaj Money Transfer`,
+      text: `Dear ${quote.name},\n\nThank you for requesting a forex quote with YashRaj Money Transfer.\nSummary: ${conversionDetails || "Quote Request"}\n\nOur team will reach out to you shortly.\n\nBest Regards,\nYashRaj Money Transfer`,
+    })
+    .then((info) => console.log("CALCULATOR CUSTOMER EMAIL SENT SUCCESS:", info.response))
+    .catch((emailErr) => console.error("CALCULATOR CUSTOMER EMAIL SEND ERROR:", emailErr));
 
     return res.status(201).json({
       success: true,
@@ -253,10 +315,10 @@ router.get("/:id", authenticate, authorizeAdmin, async (req: AuthRequest, res: R
 /*
 =========================================================
 5. UPDATE QUOTE STATUS (Admin Only)
-PUT /api/quotes/:id/status
+PUT /api/quotes/:id/status & PATCH /api/quotes/:id/status
 =========================================================
 */
-router.put("/:id/status", authenticate, authorizeAdmin, async (req: AuthRequest, res: Response) => {
+const updateQuoteStatusHandler = async (req: AuthRequest, res: Response) => {
   try {
     const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const { status } = req.body;
@@ -285,7 +347,10 @@ router.put("/:id/status", authenticate, authorizeAdmin, async (req: AuthRequest,
       error: "Failed to update status",
     });
   }
-});
+};
+
+router.put("/:id/status", authenticate, authorizeAdmin, updateQuoteStatusHandler);
+router.patch("/:id/status", authenticate, authorizeAdmin, updateQuoteStatusHandler);
 
 /*
 =========================================================

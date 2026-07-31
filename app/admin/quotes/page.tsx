@@ -104,10 +104,12 @@ export default function QuotesPage() {
           setSelectedQuote({ ...selectedQuote, status: newStatus })
         }
       } else {
-        alert("Failed to update status")
+        const errorData = await res.json().catch(() => ({}))
+        alert(errorData.error || errorData.message || "Failed to update status")
       }
     } catch (err) {
       console.error("Error updating status:", err)
+      alert("Error updating status. Please check your network connection.")
     }
   }
 
