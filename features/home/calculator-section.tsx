@@ -107,18 +107,21 @@ export function CalculatorSection() {
     const numAmount = Number(amount) || 0
     if (!fromCountry || !toCountry || numAmount <= 0) return 0
 
+    // Mode-based rate selection: "buy" mode uses buyRate, "sell" mode uses sellRate
     if (fromCurrency === "INR") {
-      // INR to Foreign Currency
+      // INR to Foreign Currency (Buying or Selling foreign currency)
       const rate = conversionType === "buy" ? toCountry.buyRate : toCountry.sellRate
       return rate > 0 ? numAmount / rate : 0
     } else if (toCurrency === "INR") {
       // Foreign Currency to INR
-      const rate = conversionType === "buy" ? fromCountry.sellRate : fromCountry.buyRate
+      const rate = conversionType === "buy" ? fromCountry.buyRate : fromCountry.sellRate
       return numAmount * rate
     } else {
-      // Cross currency conversion
-      const toINR = numAmount * fromCountry.sellRate
-      return toCountry.buyRate > 0 ? toINR / toCountry.buyRate : 0
+      // Cross currency conversion (Foreign A -> INR -> Foreign B)
+      const rateA = conversionType === "buy" ? fromCountry.buyRate : fromCountry.sellRate
+      const rateB = conversionType === "buy" ? toCountry.buyRate : toCountry.sellRate
+      const inrValue = numAmount * rateA
+      return rateB > 0 ? inrValue / rateB : 0
     }
   }
 
@@ -278,7 +281,11 @@ export function CalculatorSection() {
                   {fromCountry && toCountry && (
                     <span>
                       1 {fromCurrency === "INR" ? toCurrency : fromCurrency} = ₹
-                      {(conversionType === "buy" ? (toCountry.code === "INR" ? fromCountry.buyRate : toCountry.buyRate) : (toCountry.code === "INR" ? fromCountry.sellRate : toCountry.sellRate)).toFixed(2)} INR
+                      {(
+                        fromCurrency === "INR"
+                          ? (conversionType === "buy" ? toCountry.buyRate : toCountry.sellRate)
+                          : (conversionType === "buy" ? fromCountry.buyRate : fromCountry.sellRate)
+                      ).toFixed(2)} INR
                     </span>
                   )}
                   <div className="flex items-center gap-1 text-slate-400">
