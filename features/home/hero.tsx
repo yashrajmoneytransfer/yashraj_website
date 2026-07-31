@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { API_URL } from "@/lib/api"
 import { GetQuoteSection } from "./get-quote-section"
+import { CountryFlag } from "@/components/country-flag"
 
 export function Hero() {
   const [showQuote, setShowQuote] = useState(false)
@@ -211,7 +212,7 @@ export function Hero() {
                   className="absolute top-0 right-0 sm:right-2 w-64 max-w-[calc(100%-1rem)] p-6 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl"
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="text-4xl">{heroRates[0].flag}</div>
+                    <CountryFlag code={heroRates[0].code} flag={heroRates[0].flag} size="lg" />
                     <div>
                       <div className="text-white font-bold text-lg">{heroRates[0].code}</div>
                       <div className="text-slate-400 text-sm truncate max-w-[120px]">{heroRates[0].name}</div>
@@ -241,7 +242,7 @@ export function Hero() {
                   className="absolute top-32 left-0 sm:left-2 w-64 max-w-[calc(100%-1rem)] p-6 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl"
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="text-4xl">{heroRates[1].flag}</div>
+                    <CountryFlag code={heroRates[1].code} flag={heroRates[1].flag} size="lg" />
                     <div>
                       <div className="text-white font-bold text-lg">{heroRates[1].code}</div>
                       <div className="text-slate-400 text-sm truncate max-w-[120px]">{heroRates[1].name}</div>
@@ -271,7 +272,7 @@ export function Hero() {
                   className="absolute bottom-20 right-2 xl:right-6 w-64 max-w-[calc(100%-1rem)] p-6 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl"
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="text-4xl">{heroRates[2].flag}</div>
+                    <CountryFlag code={heroRates[2].code} flag={heroRates[2].flag} size="lg" />
                     <div>
                       <div className="text-white font-bold text-lg">{heroRates[2].code}</div>
                       <div className="text-slate-400 text-sm truncate max-w-[120px]">{heroRates[2].name}</div>
@@ -301,7 +302,7 @@ export function Hero() {
                   className="absolute bottom-0 left-2 xl:left-6 w-64 max-w-[calc(100%-1rem)] p-6 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl"
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="text-4xl">{heroRates[3].flag}</div>
+                    <CountryFlag code={heroRates[3].code} flag={heroRates[3].flag} size="lg" />
                     <div>
                       <div className="text-white font-bold text-lg">{heroRates[3].code}</div>
                       <div className="text-slate-400 text-sm truncate max-w-[120px]">{heroRates[3].name}</div>

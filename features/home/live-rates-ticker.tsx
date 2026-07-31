@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { TrendingUp, TrendingDown, Clock, Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { API_URL } from "@/lib/api"
-import { GetQuoteSection } from "./get-quote-section";
+import { CountryFlag } from "@/components/country-flag"
 
 interface CurrencyRate {
   flag: string
@@ -84,7 +84,9 @@ export function LiveRatesTicker() {
               key={`${rate.code}-${index}`}
               className="flex items-center gap-4 px-6 py-3 bg-slate-800/50 rounded-xl border border-slate-700 hover:bg-slate-800 transition-colors cursor-pointer group"
             >
-              <div className="text-3xl">{rate.flag}</div>
+              <div className="flex items-center justify-center shrink-0">
+                <CountryFlag code={rate.code} flag={rate.flag} size="lg" />
+              </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-white">{rate.code}</span>

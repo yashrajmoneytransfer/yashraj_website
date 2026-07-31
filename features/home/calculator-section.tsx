@@ -3,8 +3,7 @@
 import { motion } from "framer-motion"
 import { ArrowRightLeft, Calculator as CalculatorIcon, Clock, Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
-import { QuoteModal } from "./quote-modal"
-import { API_URL } from "@/lib/api"
+import { CountryFlag } from "@/components/country-flag"
 
 interface Country {
   code: string
@@ -206,17 +205,22 @@ export function CalculatorSection() {
                 <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
                   From
                 </label>
-                <select
-                  value={fromCurrency}
-                  onChange={(e) => setFromCurrency(e.target.value)}
-                  className="w-full h-14 px-4 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all cursor-pointer"
-                >
-                  {countries.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.flag} {c.code} - {c.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative flex items-center">
+                  <div className="absolute left-3.5 pointer-events-none flex items-center gap-1.5 z-10">
+                    <CountryFlag code={fromCountry?.code || fromCurrency} flag={fromCountry?.flag} size="md" />
+                  </div>
+                  <select
+                    value={fromCurrency}
+                    onChange={(e) => setFromCurrency(e.target.value)}
+                    className="w-full h-14 pl-14 pr-4 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all cursor-pointer"
+                  >
+                    {countries.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.code} - {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               {/* Swap Button */}
@@ -235,17 +239,22 @@ export function CalculatorSection() {
                 <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">
                   To
                 </label>
-                <select
-                  value={toCurrency}
-                  onChange={(e) => setToCurrency(e.target.value)}
-                  className="w-full h-14 px-4 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all cursor-pointer"
-                >
-                  {countries.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.flag} {c.code} - {c.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative flex items-center">
+                  <div className="absolute left-3.5 pointer-events-none flex items-center gap-1.5 z-10">
+                    <CountryFlag code={toCountry?.code || toCurrency} flag={toCountry?.flag} size="md" />
+                  </div>
+                  <select
+                    value={toCurrency}
+                    onChange={(e) => setToCurrency(e.target.value)}
+                    className="w-full h-14 pl-14 pr-4 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all cursor-pointer"
+                  >
+                    {countries.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.code} - {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
             </div>
