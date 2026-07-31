@@ -114,44 +114,29 @@ YashRaj Money Transfer Admin
       </div>
     `;
 
-    transporter.sendMail({
-      from: `YashRaj Money Transfer <${emailUser}>`,
-      to: emailUser,
-      replyTo: quote.email,
-      subject: `New Quote Request - ${quote.name}`,
-      text: adminMailBody,
-      html: adminHtmlBody,
-    })
-    .then((info) => console.log("ADMIN QUOTE EMAIL SENT SUCCESS:", info.response))
-    .catch((emailErr) => console.error("ADMIN QUOTE EMAIL SEND ERROR:", emailErr));
-
-    // 2. Customer Confirmation Email
-    const customerHtmlBody = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
-        <h2 style="color: #1e3a8a;">Quote Request Received!</h2>
-        <p style="font-size: 14px; color: #333;">Dear <strong>${quote.name}</strong>,</p>
-        <p style="font-size: 14px; color: #555;">Thank you for reaching out to YashRaj Money Transfer. We have successfully received your quote request.</p>
-        <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; margin: 15px 0;">
-          <h4 style="margin-top: 0; color: #1e3a8a;">Request Summary:</h4>
-          <p style="margin: 5px 0; font-size: 14px;"><strong>Amount:</strong> ₹${Number(quote.amount).toLocaleString()}</p>
-          <p style="margin: 5px 0; font-size: 14px;"><strong>Currency:</strong> ${quote.fromCurrency || "INR"} &rarr; ${quote.toCurrency || quote.currency}</p>
-          <p style="margin: 5px 0; font-size: 14px;"><strong>Purpose:</strong> ${quote.purpose}</p>
-        </div>
-        <p style="font-size: 14px; color: #333;">Our forex specialist will review your request and get in touch with you shortly.</p>
-        <br/>
-        <p style="font-size: 12px; color: #888;">Best Regards,<br/><strong>YashRaj Money Transfer Team</strong></p>
-      </div>
-    `;
-
-    transporter.sendMail({
-      from: `YashRaj Money Transfer <${emailUser}>`,
-      to: quote.email,
-      subject: `Quote Request Received - YashRaj Money Transfer`,
-      text: `Dear ${quote.name},\n\nThank you for requesting a forex quote with YashRaj Money Transfer. We have received your request for Amount: ${quote.amount} (${quote.fromCurrency || "INR"} to ${quote.toCurrency || quote.currency}).\n\nOur team will contact you shortly.\n\nBest Regards,\nYashRaj Money Transfer`,
-      html: customerHtmlBody,
-    })
-    .then((info) => console.log("CUSTOMER QUOTE CONFIRMATION EMAIL SENT SUCCESS:", info.response))
-    .catch((emailErr) => console.error("CUSTOMER QUOTE CONFIRMATION EMAIL ERROR:", emailErr));
+    // Await email dispatches so cloud environments (Render/Vercel) do not freeze TCP sockets prematurely
+    try {
+      await Promise.allSettled([
+        transporter.sendMail({
+          from: `YashRaj Money Transfer <${emailUser}>`,
+          to: emailUser,
+          replyTo: quote.email,
+          subject: `New Quote Request - ${quote.name}`,
+          text: adminMailBody,
+          html: adminHtmlBody,
+        }),
+        transporter.sendMail({
+          from: `YashRaj Money Transfer <${emailUser}>`,
+          to: quote.email,
+          subject: `Quote Request Received - YashRaj Money Transfer`,
+          text: `Dear ${quote.name},\n\nThank you for requesting a forex quote with YashRaj Money Transfer. We have received your request for Amount: ${quote.amount} (${quote.fromCurrency || "INR"} to ${quote.toCurrency || quote.currency}).\n\nOur team will contact you shortly.\n\nBest Regards,\nYashRaj Money Transfer`,
+          html: customerHtmlBody,
+        }),
+      ]);
+      console.log("QUOTE EMAILS SENT SUCCESSFULLY");
+    } catch (emailErr) {
+      console.error("QUOTE EMAIL SEND ERROR:", emailErr);
+    }
 
     return res.status(201).json({
       success: true,
@@ -217,25 +202,26 @@ Submitted Date: ${quote.createdAt.toLocaleString()}
 YashRaj Money Transfer
 `;
 
-    transporter.sendMail({
-      from: `YashRaj Calculator <${emailUser}>`,
-      to: emailUser,
-      replyTo: quote.email,
-      subject: `Calculator Quote: ${conversionDetails || quote.name}`,
-      text: adminMailBody,
-    })
-    .then((info) => console.log("CALCULATOR EMAIL SENT SUCCESS:", info.response))
-    .catch((emailErr) => console.error("CALCULATOR EMAIL SEND ERROR:", emailErr));
-
-    // Also send confirmation to customer
-    transporter.sendMail({
-      from: `YashRaj Money Transfer <${emailUser}>`,
-      to: quote.email,
-      subject: `Calculator Quote Request Received - YashRaj Money Transfer`,
-      text: `Dear ${quote.name},\n\nThank you for requesting a forex quote with YashRaj Money Transfer.\nSummary: ${conversionDetails || "Quote Request"}\n\nOur team will reach out to you shortly.\n\nBest Regards,\nYashRaj Money Transfer`,
-    })
-    .then((info) => console.log("CALCULATOR CUSTOMER EMAIL SENT SUCCESS:", info.response))
-    .catch((emailErr) => console.error("CALCULATOR CUSTOMER EMAIL SEND ERROR:", emailErr));
+    try {
+      await Promise.allSettled([
+        transporter.sendMail({
+          from: `YashRaj Calculator <${emailUser}>`,
+          to: emailUser,
+          replyTo: quote.email,
+          subject: `Calculator Quote: ${conversionDetails || quote.name}`,
+          text: adminMailBody,
+        }),
+        transporter.sendMail({
+          from: `YashRaj Money Transfer <${emailUser}>`,
+          to: quote.email,
+          subject: `Calculator Quote Request Received - YashRaj Money Transfer`,
+          text: `Dear ${quote.name},\n\nThank you for requesting a forex quote with YashRaj Money Transfer.\nSummary: ${conversionDetails || "Quote Request"}\n\nOur team will reach out to you shortly.\n\nBest Regards,\nYashRaj Money Transfer`,
+        }),
+      ]);
+      console.log("CALCULATOR QUOTE EMAILS SENT SUCCESSFULLY");
+    } catch (emailErr) {
+      console.error("CALCULATOR QUOTE EMAIL SEND ERROR:", emailErr);
+    }
 
     return res.status(201).json({
       success: true,
