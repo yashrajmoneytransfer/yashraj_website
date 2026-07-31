@@ -48,7 +48,7 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center w-full max-w-full overflow-hidden bg-gradient-to-br from-primary-900 via-navy-900 to-primary-950">
+    <section className="relative min-h-[80vh] lg:min-h-[85vh] flex items-center justify-center w-full max-w-full overflow-hidden bg-gradient-to-br from-primary-900 via-navy-900 to-primary-950">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-72 h-72 bg-gold-500/10 rounded-full blur-3xl animate-float" />
@@ -89,7 +89,7 @@ export function Hero() {
       {/* Grid Pattern */}
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
 
-      <div className="relative z-10 container mx-auto px-4 py-20">
+      <div className="relative z-10 container mx-auto px-4 pt-24 pb-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <motion.div

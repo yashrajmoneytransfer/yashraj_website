@@ -72,7 +72,7 @@ export function LiveRatesTicker() {
   }
 
   return (
-    <div className="w-full max-w-full bg-slate-900 py-4 overflow-hidden border-y border-slate-800 relative">
+    <div className="w-full max-w-full bg-slate-900 py-2.5 -mt-2 sm:-mt-4 relative z-20 overflow-hidden border-y border-slate-800/80 shadow-md">
       <div className="flex items-center w-full max-w-full overflow-hidden min-w-0">
         <motion.div
           animate={{ x: [0, -1000] }}
