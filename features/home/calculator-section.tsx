@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { ArrowRightLeft, Calculator as CalculatorIcon, Clock, Loader2 } from "lucide-react"
+import { useState, useEffect } from "react"
 import { QuoteModal } from "./quote-modal"
 import { API_URL } from "@/lib/api"
 import { CountryFlag } from "@/components/country-flag"
